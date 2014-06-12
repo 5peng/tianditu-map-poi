@@ -3,9 +3,75 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" type="text/css" href="components/leaflet-dist/leaflet.css">
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <h1>MapPois</h1>
+    <p>Welcome to use me!</p>
+    <form method="GET" id="form">
+      <input type="text" placeholder="search key word">
+      <button type="submit">获得poi</button>
+    </form>
+    <p id="loading" style="display: none;">Loading</p>
+    <div style="width: 800px; height: 400px; background: #eee;" id="map"></div>
+
+    <script src="components/jquery/dist/jquery.min.js"></script>
+    <script src="components/leaflet-dist/leaflet.js"></script>
+    <script src="components/leaflet-chineseTmsProviders/src/leaflet.ChineseTmsProviders.js"></script>
+    <script>
+
+      // 实例化地图
+      var baseLayer = {
+        Normal: L.tileLayer.chinaProvider('TianDiTu.Normal.Map', {}),
+        Satellite: L.tileLayer.chinaProvider('TianDiTu.Satellite.Map', {})
+      }
+
+      var map = L.map('map', {
+          center: new L.LatLng(31.239297515320857, 121.49282455444335),
+          zoom: 13,
+          layers: baseLayer.Normal
+      });
+
+      map.layersControl = L.control.layers(baseLayer).addTo(map);
+
+      $('#form').submit(function(e) {
+
+        var that = this;
+
+        e.preventDefault();
+        var keyWord = $(this).find('input').val();
+        var bound = map.getBounds();
+        var bLeft = bound.getSouthWest().lng;
+        var bBottom = bound.getSouthWest().lat;
+        var bRight = bound.getNorthEast().lng;
+        var bTop = bound.getNorthEast().lat;
+        var mapBound = bLeft + "," + bBottom + "," + bRight + "," + bTop;
+
+        $.ajax({
+          url: '/interests',
+          data: {
+            keyWord: keyWord,
+            mapBound: mapBound
+          },
+          success: function (data) {
+            console.log(data);
+          },
+          statusCode: {
+            401: function(data) {
+              alert('Bad request');
+            }
+          },
+          beforeSend: function() {
+            $(that).hide();
+            $('#loading').show();
+          },
+          complete: function() {
+            $(that).show();
+            $('#loading').hide();
+          }
+        });
+      });
+
+    </script>
   </body>
 </html>
