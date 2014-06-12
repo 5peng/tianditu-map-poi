@@ -23,35 +23,67 @@ var PoisSchema = new mongoose.Schema({
 
 var PoisModel = db.model('Pois', PoisSchema);
 
+function getPoisAndSave(postStr, start, res) {
+  postStr.start = start;
+  var url = 'http://www.tianditu.com/query.shtml?' +
+            'type=query&' +  
+            'postStr=' + JSON.stringify(postStr);
+
+  request({
+    url: url,
+    method: 'GET'
+  }, function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var pois = JSON.parse(body);
+      // 遍历 pois
+      pois.pois.forEach(function(item) {
+        // 检查数据库是否存在
+        PoisModel.findOne({ name : item.name}, function(err, result) {
+          if (result) {
+            console.log('"%s" 该poi已经存在', item.name);
+          }
+          // 不存在该 poi
+          else {
+            var PoisEntity = new PoisModel(item);
+            PoisEntity.save();
+            console.log('√ "%s" 新加入的存储', item.name);
+          }
+        });
+      });
+
+      // 继续循环
+      var already = parseInt(postStr.count) + parseInt(start);
+      var surplus = pois.count - already;
+      if (surplus > 0) {
+        getPoisAndSave(postStr, already, res);
+      }
+      else {
+        res.send({ success: 1, count: pois.count, keyWord: pois.keyWord });
+      }
+    }
+  });
+}
+
 /**
  * 远程请求数据，并写入mongoDB
  */
 router.get('/', function(req, res) {
 
-  console.log('interests');
-  // 获得数据
-  request({
-    url: 'http://www.tianditu.com/query.shtml?type=query&postStr={%22keyWord%22:%22%E5%8C%97%E4%BA%AC%22,%22level%22:%2211%22,%22mapBound%22:%22116.10773,39.77369,116.69481,40.03705%22,%22queryType%22:%2210%22,%22count%22:%2250%22,%22start%22:%220%22}',
-    method: 'GET'
-  }, function(error, response, body) {
-    if (!error && response.statusCode == 200) {
-      var pois = JSON.parse(body);
-      pois.pois.forEach(function(item) {
-        var PoisEntity = new PoisModel(item);
-        // PoisEntity.save();
-      });
-    }
-  });
-  // var PersonModel = db.model('Person', PersonSchema);
+  if (!req.query.mapBound || !req.query.keyWord) {
+    res.status(401);
+    res.send({ error: 'Bad Request'});
+    return;
+  }
 
-  // var personEntity = new PersonModel({name:'Krouky'});
+  var postStr = {
+    keyWord: req.query.keyWord,
+    level: req.query.level || "15",
+    mapBound: req.query.mapBound,
+    queryType: "10",
+    count: parseInt(req.query.count) || 50
+  };
 
-  // personEntity.save();
-
-  // PersonModel.findOne({'name': 'Krouky'}, function(err, persons) {
-  //   console.log(persons);
-  // });
-
+  getPoisAndSave(postStr, 0, res);
 });
 
 /**
