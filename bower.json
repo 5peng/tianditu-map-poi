@@ -1,0 +1,24 @@
+{
+  "name": "tianditu-map-poi",
+  "version": "0.1.0",
+  "authors": [
+    "MinoWu <minowu@foxmail.com>"
+  ],
+  "description": "tianditu map poi",
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "2.*",
+    "leaflet-dist": "*"
+  }
+}
