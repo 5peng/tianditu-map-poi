@@ -19,6 +19,7 @@
   ],
   "dependencies": {
     "jquery": "2.*",
-    "leaflet-dist": "*"
+    "leaflet-dist": "*",
+    "leaflet-chineseTmsProviders": "https://github.com/htoooth/Leaflet.ChineseTmsProviders.git"
   }
 }
