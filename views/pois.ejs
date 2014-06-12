@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+
+  <table border="1" cellpadding="5">
+    <thead>
+      <tr>
+        <th>编号</th>
+        <th>名称</th>
+        <th>联系方式</th>
+        <th>经纬度</th>
+        <th>地址</th>
+        <th>网址</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for(var i=0; i<pois.length; i++) {%>
+      <tr>
+        <td><%= pois[i]._id %></td>
+        <td><%= pois[i].name %></td>
+        <td><%= pois[i].phone %></td>
+        <td><%= pois[i].lonlat %></td>
+        <td><%= pois[i].address %></td>
+        <td><%= pois[i].url %></td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+
+</body>
+</html>
