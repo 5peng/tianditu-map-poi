@@ -14,11 +14,27 @@ db.once('open',function(){
 
 // 创建 Schema
 var PoisSchema = new mongoose.Schema({
-  phone:String,
-  lonlat:String,
-  address:String,
-  name:String,
-  url:String
+  phone: String,
+  address: String,
+  name: { type: String, index: true },
+  url: String,
+  location: {
+    lng: Number,
+    lat: Number,
+  },
+  createdAt: { type: Date },
+  updatedAt: { type: Date }
+});
+
+PoisSchema.index({ name: 1});
+
+PoisSchema.pre('save', function(next) {
+  now = new Date();
+  this.updatedAt = now;
+  if ( !this.createdAt ) {
+    this.createdAt = now;
+  }
+  next();
 });
 
 var PoisModel = db.model('Pois', PoisSchema);
@@ -37,8 +53,15 @@ function getPoisAndSave(postStr, start, res) {
       var pois = JSON.parse(body);
       // 遍历 pois
       pois.pois.forEach(function(item) {
+
+        var location = item.location = {};
+        location.lng = item.lonlat.split(" ")[0];
+        location.lat = item.lonlat.split(" ")[1];
+
+        // console.log(lng, lat);
+
         // 检查数据库是否存在
-        PoisModel.findOne({ name: item.name, lonlat: item.lonlat}, function(err, result) {
+        PoisModel.findOne({ name: item.name, location: location}, function(err, result) {
           if (result) {
             console.log('× "%s" 该poi已经存在', item.name);
           }
