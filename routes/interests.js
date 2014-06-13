@@ -38,9 +38,9 @@ function getPoisAndSave(postStr, start, res) {
       // 遍历 pois
       pois.pois.forEach(function(item) {
         // 检查数据库是否存在
-        PoisModel.findOne({ name : item.name}, function(err, result) {
+        PoisModel.findOne({ name: item.name, lonlat: item.lonlat}, function(err, result) {
           if (result) {
-            console.log('"%s" 该poi已经存在', item.name);
+            console.log('× "%s" 该poi已经存在', item.name);
           }
           // 不存在该 poi
           else {
