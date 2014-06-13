@@ -34,6 +34,14 @@
 
       map.layersControl = L.control.layers(baseLayer).addTo(map);
 
+      $.get('/interests/query', { keyWord: '东方明珠' }, function(data) {
+        console.log('共有 %d 个 marker', data.data.length);
+        $.each(data.data, function(index, value) {
+          var marker = new L.marker([value.location.lat, value.location.lng]);
+          marker.addTo(map);
+        });
+      });
+
       $('#form').submit(function(e) {
 
         var that = this;
