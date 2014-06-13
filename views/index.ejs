@@ -21,18 +21,22 @@
     <script>
 
       // 实例化地图
-      var baseLayer = {
+      var baseLayers = {
         Normal: L.tileLayer.chinaProvider('TianDiTu.Normal.Map', {}),
         Satellite: L.tileLayer.chinaProvider('TianDiTu.Satellite.Map', {})
+      }
+
+      var overlays = {
+        Annotion: L.tileLayer.chinaProvider('TianDiTu.Normal.Annotion', {})
       }
 
       var map = L.map('map', {
           center: new L.LatLng(31.239297515320857, 121.49282455444335),
           zoom: 13,
-          layers: baseLayer.Normal
+          layers: [ baseLayers.Normal, overlays.Annotion ]
       });
 
-      map.layersControl = L.control.layers(baseLayer).addTo(map);
+      map.layersControl = L.control.layers(baseLayers, overlays).addTo(map);
 
       $.get('/interests/query', { keyWord: '东方明珠' }, function(data) {
         console.log('共有 %d 个 marker', data.data.length);
