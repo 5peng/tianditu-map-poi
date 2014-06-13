@@ -112,9 +112,18 @@ router.get('/', function(req, res) {
 /**
  * 获得 mongoDB 数据
  */
-router.get('/query', function(req, res) {
+router.get('/queryall', function(req, res) {
   PoisModel.find(function(error, pois) {
     res.render('pois', { title: 'Pois 查询', pois: pois });
+  });
+});
+
+router.get('/query', function(req, res) {
+
+  var keyWord = new RegExp(req.query.keyWord, 'i');
+
+  PoisModel.find({ name: keyWord }, function(error, pois) {
+    res.send({data: pois});
   });
 });
 
