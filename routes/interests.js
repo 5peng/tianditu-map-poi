@@ -55,10 +55,8 @@ function getPoisAndSave(postStr, start, res) {
       pois.pois.forEach(function(item) {
 
         var location = item.location = {};
-        location.lng = item.lonlat.split(" ")[0];
-        location.lat = item.lonlat.split(" ")[1];
-
-        // console.log(lng, lat);
+        location.lng = parseFloat(item.lonlat.split(" ")[0]);
+        location.lat = parseFloat(item.lonlat.split(" ")[1]);
 
         // 检查数据库是否存在
         PoisModel.findOne({ name: item.name, location: location}, function(err, result) {
